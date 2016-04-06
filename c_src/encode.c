@@ -16,7 +16,7 @@
 
 #include "erl_nif.h"
 #include "erl_nif_compat.h"
-#include "yajl/yajl_encode.h"
+#include "yajl/yajl_gen.h"
 
 #if defined(_WIN32) || defined(WIN32) || defined(__WIN32__)
 #include <float.h>
@@ -67,17 +67,14 @@ static int
 encode_string(void* vctx, ERL_NIF_TERM binary)
 {
     encode_ctx* ctx = (encode_ctx*)vctx;
+    yajl_gen g = yajl_gen_alloc(NULL);
+    yajl_gen_config(g, yajl_gen_print_callback, fill_buffer, ctx);
     ErlNifBinary bin;
 
     if(!enif_inspect_binary(ctx->env, binary, &bin)) {
         return NOMEM;
     }
-    fill_buffer(ctx, "\"", 1);
-    if (ctx->error) {
-        return ctx->error;
-    }
-    yajl_string_encode2(fill_buffer, ctx, bin.data, bin.size);
-    fill_buffer(ctx, "\"", 1);
+    yajl_gen_string(g, bin.data, bin.size);
 
     return ctx->error;
 }

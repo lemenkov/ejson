@@ -230,8 +230,10 @@ ERL_NIF_TERM
 reverse_tokens(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
     decode_ctx ctx;
-    yajl_parser_config conf = {0, 1}; // No comments, check utf8
-    yajl_handle handle = yajl_alloc(&decoder_callbacks, &conf, NULL, &ctx);
+    yajl_handle handle = yajl_alloc(&decoder_callbacks, NULL, &ctx);
+    yajl_config(handle, yajl_allow_comments, 0);
+    yajl_config(handle, yajl_dont_validate_strings, 0);
+    yajl_config(handle, yajl_allow_trailing_garbage, 1);
     yajl_status status;
     unsigned int used;
     ErlNifBinary bin;
