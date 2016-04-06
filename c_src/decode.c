@@ -254,7 +254,7 @@ reverse_tokens(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     // check so that "2008-20-10" doesn't pass.
     if(status == yajl_status_insufficient_data && used == bin.size)
     {
-        status = yajl_parse_complete(handle);
+        status = yajl_complete_parse(handle);
     }
 
     if(status == yajl_status_ok && used != bin.size)
