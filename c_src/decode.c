@@ -17,8 +17,6 @@
 #include "erl_nif.h"
 #include "erl_nif_compat.h"
 #include "yajl/yajl_parse.h"
-#include "yajl/yajl_parser.h"
-#include "yajl/yajl_lex.h"
 
 typedef struct {
     ERL_NIF_TERM head;
@@ -254,7 +252,7 @@ reverse_tokens(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     // Parsing something like "2.0" (without quotes) will
     // cause a spurious semi-error. We add the extra size
     // check so that "2008-20-10" doesn't pass.
-    if(status == yajl_status_insufficient_data && used == bin.size)
+    if(status != yajl_status_ok && used == bin.size)
     {
         status = yajl_complete_parse(handle);
     }
@@ -270,6 +268,11 @@ reverse_tokens(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
             goto done;
         }
     }
+    if(status == yajl_status_ok && used == bin.size){
+	    status = yajl_complete_parse(handle);
+	    if (status == yajl_status_error)
+		    status = yajl_status_error + 1;
+    }
 
     switch(status)
     {
@@ -281,7 +284,7 @@ reverse_tokens(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
             ret = make_error(handle, env);
             goto done;
 
-        case yajl_status_insufficient_data:
+        case yajl_status_error + 1:
             ret = enif_make_tuple(env, 2,
                 enif_make_atom(env, "error"),
                 enif_make_atom(env, "insufficient_data")
