@@ -79,7 +79,7 @@ decode_boolean(void* ctx, int val)
 }
 
 static int
-decode_number(void * ctx, const char * numberVal, unsigned int numberLen)
+decode_number(void * ctx, const char * numberVal, size_t numberLen)
 {
     // scan in the input to see if it's a float or int
 
@@ -131,7 +131,7 @@ loopend:
 
 
 static int
-decode_string(void* ctx, const unsigned char* data, unsigned int size)
+decode_string(void* ctx, const unsigned char* data, size_t size)
 {
     ErlNifBinary bin;
     if(!enif_alloc_binary_compat(ENV(ctx), size, &bin))
@@ -176,7 +176,7 @@ decode_end_map(void* ctx)
 
 
 static int
-decode_map_key(void* ctx, const unsigned char* data, unsigned int size)
+decode_map_key(void* ctx, const unsigned char* data, size_t size)
 {
     ErlNifBinary bin;
     if(!enif_alloc_binary_compat(ENV(ctx), size, &bin))
